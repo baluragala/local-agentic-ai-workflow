@@ -1,0 +1,26 @@
+<section id="loop">
+<div class="head">
+<p class="eyebrow">01 · THE AGENTIC LOOP WE WILL BUILD</p>
+<h2>Plan once, then decide → validate → execute until done</h2>
+</div>
+<div class="flow">
+<div class="node"><p class="nt">Receive task</p><p class="ns">APP</p></div>
+<x-shape kind="arrow-right" class="arr"></x-shape>
+<div class="node model"><p class="nt">Understand + plan</p><p class="ns">LLM · JSON schema</p></div>
+<x-shape kind="arrow-right" class="arr"></x-shape>
+<div class="node"><p class="nt">Missing info or out of scope?</p><p class="ns">APP → ask / stop</p></div>
+</div>
+<div class="flow" style="background:var(--panel);border-radius:20px;padding:32px;gap:20px">
+<p class="eyebrow" style="width:150px">LOOP ↺</p>
+<div class="node model"><p class="nt">Decide next action</p><p class="ns">LLM · tool call or answer</p></div>
+<x-shape kind="arrow-right" class="arr"></x-shape>
+<div class="node" style="background:var(--light)"><p class="nt">Validate call</p><p class="ns">APP</p></div>
+<x-shape kind="arrow-right" class="arr"></x-shape>
+<div class="node" style="background:var(--light)"><p class="nt">Execute tool</p><p class="ns">APP → result to state</p></div>
+</div>
+<div class="flow">
+<x-shape kind="arrow-down" style="width:28px;height:52px;background:var(--orange)"></x-shape>
+<p class="body">No tool requested → <b>APP</b> runs completion checks → terminate with a status derived from tool results. Safety stop at <b>max_steps</b>.</p>
+</div>
+<aside>Walk the loop slowly. Dark boxes are the only places the model acts. Everything else is our code. Name the termination conditions explicitly: final answer, needs_info, out_of_scope, max_steps.</aside>
+</section>

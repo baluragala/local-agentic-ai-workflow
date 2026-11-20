@@ -1,0 +1,22 @@
+<section id="ollama">
+<div class="head">
+<p class="eyebrow">02 · SETTING UP OLLAMA</p>
+<h2>Ollama is a local model server over HTTP</h2>
+</div>
+<div class="flow" style="gap:28px">
+<div class="node" style="width:360px"><p class="nt">Python app</p><p class="ns">the orchestrator</p></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><p class="small">POST /api/chat</p><x-shape kind="arrow-right" class="arr" style="width:120px"></x-shape></div>
+<div class="node model" style="width:400px"><p class="nt">Ollama server</p><p class="ns">localhost:11434</p></div>
+<x-shape kind="arrow-right" class="arr"></x-shape>
+<div class="node" style="width:380px"><p class="nt">Model weights</p><p class="ns">qwen2.5:1.5b · ~1 GB</p></div>
+</div>
+<div class="code">
+<span class="c"># Colab: install, start in background, pull</span><br>
+curl -fsSL https://ollama.com/install.sh | sh<br>
+subprocess.Popen([<span class="s">"ollama"</span>, <span class="s">"serve"</span>])<br>
+client.pull(<span class="s">"qwen2.5:1.5b"</span>)<br>
+client.chat(model=MODEL, messages=[...])
+</div>
+<p class="body">Locally: install from ollama.com and the notebook detects the running server and skips installation.</p>
+<aside>Run notebook cells 2.1 to 2.6 live. Show the raw HTTP call first, so learners see the SDK is only a convenience wrapper. Point out total_duration on the first call includes loading the model into memory.</aside>
+</section>

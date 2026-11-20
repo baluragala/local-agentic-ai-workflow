@@ -1,0 +1,27 @@
+<section id="test-suite">
+<div class="head">
+<p class="eyebrow">05 · TEST SUITE</p>
+<h2>8 cases cover valid paths and failures, and the set grows</h2>
+</div>
+<div class="cols2" style="grid-template-columns:1.15fr 1fr">
+<div class="code" style="font-size:24px">
+TestCase(<span class="s">"TC02-damaged"</span>,<br>
+&#160;request=<span class="s">"My headphones from ORD-1002<br>
+&#160;&#160;arrived damaged..."</span>,<br>
+&#160;expected_intent=<span class="s">"return_request"</span>,<br>
+&#160;expected_status=<span class="s">"ticket_created"</span>,<br>
+&#160;required_tools=[order, eligibility,<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;refund, ticket],<br>
+&#160;expected_refund=149.00,<br>
+&#160;must_mention=[(<span class="s">"RET-1002"</span>,), (<span class="s">"149"</span>,)])<br>
+<br>
+results = run_suite(TEST_CASES)
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div class="card"><p class="tag">TC01–TC08 · CORE</p><p class="txt">status · damaged · changed mind · outside window · non-returnable · missing ID · not found · out of scope</p></div>
+<div class="card"><p class="tag">TC09–TC11 · ADDED</p><p class="txt">#1001 ID format · missing reason · not yet delivered</p></div>
+<div class="card hl"><p class="tag">RULE</p><p class="txt">Every bug you find becomes a new test case.</p></div>
+</div>
+</div>
+<aside>Run the suite live. Show pass rate per criterion and the drill-down cell for any red row. Small models vary across hardware and versions, so in practice run each case several times and track the pass rate over time.</aside>
+</section>

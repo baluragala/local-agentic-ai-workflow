@@ -1,0 +1,15 @@
+<section id="tools">
+<div class="head">
+<p class="eyebrow">01 · AVAILABLE TOOLS</p>
+<h2>Four small tools with clear inputs and outputs</h2>
+</div>
+<table>
+<tr><th style="width:30%">Tool</th><th style="width:34%">Input</th><th>Output</th></tr>
+<tr><td>get_order</td><td>order_id</td><td>item, category, price, status, delivery date</td></tr>
+<tr><td>check_return_eligibility</td><td>order_id</td><td>eligible true/false + reason</td></tr>
+<tr><td>calculate_refund</td><td>order_id, return_reason</td><td>price, restocking fee, refund amount</td></tr>
+<tr><td>create_return_ticket</td><td>order_id, return_reason, refund_amount</td><td>ticket_id</td></tr>
+</table>
+<p class="body">Tools are ordinary deterministic Python over a mock database. No AI inside them, so we can test them before any model is involved.</p>
+<aside>Keep tools few and simple on purpose. Point out the dependency chain: refund needs eligibility, ticket needs the refund amount. That dependency is what makes the task multi-step and conditional.</aside>
+</section>

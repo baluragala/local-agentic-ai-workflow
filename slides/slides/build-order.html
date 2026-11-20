@@ -1,0 +1,17 @@
+<section id="build-order">
+<div class="head">
+<p class="eyebrow">03 · BUILDING THE WORKFLOW · 55 MIN</p>
+<h2>Built incrementally, one component at a time</h2>
+</div>
+<div class="cols4">
+<div class="card in" style="--i:0"><p class="tag">3.1</p><h3>Spec</h3><p class="txt">goal, I/O, missing-info rule, termination</p></div>
+<div class="card in" style="--i:1"><p class="tag">3.2–3.3</p><h3>Data + tools</h3><p class="txt">tested with no LLM</p></div>
+<div class="card in" style="--i:2"><p class="tag">3.4</p><h3>Schemas</h3><p class="txt">what the model sees</p></div>
+<div class="card in" style="--i:3"><p class="tag">3.5</p><h3>State</h3><p class="txt">one object per run, layer-tagged log</p></div>
+<div class="card in" style="--i:4"><p class="tag">3.6</p><h3>Validator</h3><p class="txt">the application’s gatekeeper</p></div>
+<div class="card in" style="--i:5"><p class="tag">3.7</p><h3>LLM wrapper</h3><p class="txt">one place for model calls</p></div>
+<div class="card in" style="--i:6"><p class="tag">3.8–3.9</p><h3>Planner + 1 step</h3><p class="txt">by hand, before automating</p></div>
+<div class="card hl in" style="--i:7"><p class="tag">3.10–3.11</p><h3>Full loop</h3><p class="txt">plus a traced run</p></div>
+</div>
+<aside>Write the spec first and read it aloud: it is the contract every later piece implements and the evaluation checks. Test each tool directly before the model touches anything. If a tool is wrong, no prompt will fix the agent.</aside>
+</section>

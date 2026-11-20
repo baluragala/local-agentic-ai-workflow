@@ -1,0 +1,17 @@
+<section id="criteria">
+<div class="head">
+<p class="eyebrow">05 · EVALUATION · 30 MIN</p>
+<h2>Seven criteria, each with a clear pass rule</h2>
+</div>
+<table class="tight">
+<tr><th style="width:5%">#</th><th style="width:24%">Criterion</th><th style="width:55%">Valid when …</th><th>Layer</th></tr>
+<tr><td>1</td><td>Interpretation</td><td>planner intent == expected intent</td><td>model</td></tr>
+<tr><td>2</td><td>Planning</td><td>missing-info decision matches expectation</td><td>model + app</td></tr>
+<tr><td>3</td><td>Tool selection</td><td>no forbidden tool, no unknown tool requested</td><td>model</td></tr>
+<tr><td>4</td><td>Tool execution</td><td>no crashes; at most one rejected request</td><td>workflow</td></tr>
+<tr><td>5</td><td>Step completion</td><td>required tools appear in order</td><td>workflow</td></tr>
+<tr><td>6</td><td>Final output</td><td>non-empty, mentions the required facts</td><td>model</td></tr>
+<tr><td>7</td><td>Business outcome</td><td>status, ticket and refund match expectation</td><td>business</td></tr>
+</table>
+<aside>Each test case declares expected intent, expected status, required tools in order, forbidden tools, expected refund and must-mention facts. evaluate() compares the actual execution recorded in state against these requirements.</aside>
+</section>

@@ -1,0 +1,22 @@
+<section id="agent-loop" class="dark">
+<div class="head">
+<p class="eyebrow">03 · THE FULL LOOP</p>
+<h2>About 30 lines that are the whole agent</h2>
+</div>
+<div class="code" style="font-size:24px">
+<span class="k">while</span> state.step &lt; max_steps:<br>
+&#160;&#160;&#160;&#160;state.step += 1<br>
+&#160;&#160;&#160;&#160;msg, calls = call_llm(state.messages, tools=TOOL_SCHEMAS)&#160;&#160;&#160;&#160;&#160;&#160;<span class="c"># 🧠 model proposes</span><br>
+&#160;&#160;&#160;&#160;<span class="k">if not</span> calls:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;gap = completion_gap(state)&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="c"># 📦 eligible but no ticket?</span><br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="k">if</span> gap <span class="k">and not</span> nudged: nudge once; <span class="k">continue</span><br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;state.final_answer = msg[<span class="s">"content"</span>]; <span class="k">break</span><br>
+&#160;&#160;&#160;&#160;<span class="k">for</span> c <span class="k">in</span> calls:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;errors = validate_tool_call(c.name, c.args, state)&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="c"># 🛡️ app checks</span><br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;result = error <span class="k">if</span> errors <span class="k">else</span> execute_tool(c.name, c.args)&#160;<span class="c"># 🔧 app executes</span><br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;state.messages.append(tool_message(result))&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="c"># result → state</span><br>
+<br>
+state.status = derive_status(state)&#160;&#160;&#160;<span class="c"># from TOOL RESULTS, not the model’s words</span>
+</div>
+<aside>Read the loop line by line and map each line to the loop diagram from Section 1. Then run the traced execution in 3.11 on the damaged headphones request and read the trace top to bottom.</aside>
+</section>

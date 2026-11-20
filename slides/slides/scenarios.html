@@ -1,0 +1,17 @@
+<section id="scenarios">
+<div class="head">
+<p class="eyebrow">04 · END-TO-END DEMO · 40 MIN</p>
+<h2>One agent, six different paths</h2>
+</div>
+<table class="tight">
+<tr><th style="width:24%">Scenario</th><th style="width:30%">Input</th><th style="width:30%">Tool path</th><th>Status</th></tr>
+<tr><td>A · straightforward</td><td>“Where is ORD-1006?”</td><td>get_order</td><td>answered</td></tr>
+<tr><td>B · multi-tool</td><td>ORD-1002 arrived damaged</td><td>order → eligibility → refund → ticket</td><td>ticket_created</td></tr>
+<tr><td>C · missing info</td><td>no order ID</td><td>none</td><td>needs_info</td></tr>
+<tr><td>D · different path</td><td>ORD-1003, 54 days old</td><td>order → eligibility</td><td>declined</td></tr>
+<tr><td>E · fee applies</td><td>ORD-1004, changed mind</td><td>full path, $36 refund</td><td>ticket_created</td></tr>
+<tr><td>F · non-returnable</td><td>ORD-1005 gift card</td><td>order → eligibility</td><td>declined</td></tr>
+</table>
+<p class="body">Ask learners to predict the path before running each cell. The side-by-side table at the end shows the path changing with the input.</p>
+<aside>Run cells A to F live with verbose traces on. For E, ask: where does the $36 come from? Answer: calculate_refund, never the model. If the real model goes off-path here, do not hide it; jump to diagnose(state).</aside>
+</section>

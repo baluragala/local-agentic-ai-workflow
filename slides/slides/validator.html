@@ -1,0 +1,17 @@
+<section id="validator">
+<div class="head">
+<p class="eyebrow">03 · VALIDATION &amp; EXECUTION</p>
+<h2>Nothing runs until the app checks it</h2>
+</div>
+<div class="cols3">
+<div class="card in" style="--i:0"><p class="num">1</p><h3>Does the tool exist?</h3><p class="txt">Small models invent names like issue_refund.</p></div>
+<div class="card in" style="--i:1"><p class="num">2</p><h3>Are the arguments valid?</h3><p class="txt">Required present, no extras, enums respected. "149.00" as a string is coerced.</p></div>
+<div class="card hl in" style="--i:2"><p class="num" style="color:var(--orange)">3</p><h3>Business preconditions</h3><p class="txt">Refund only after an eligible check. Ticket only with the exact calculated amount.</p></div>
+</div>
+<div class="code">
+errors = validate_tool_call(name, args, state)<br>
+result = {<span class="s">"error"</span>: ...} <span class="k">if</span> errors <span class="k">else</span> execute_tool(name, args)&#160;&#160;<span class="c"># rejected = never executed</span><br>
+state.messages.append({<span class="s">"role"</span>: <span class="s">"tool"</span>, <span class="s">"content"</span>: json.dumps(result)})&#160;&#160;<span class="c"># model can self-correct</span>
+</div>
+<aside>Check 3 is the key idea: workflow order that the business requires is enforced in code, not left to the prompt. execute_tool also catches exceptions so a crashing tool never crashes the agent.</aside>
+</section>

@@ -1,0 +1,10 @@
+<section id="status-truth" class="accent" style="justify-content:center">
+<p class="eyebrow" style="color:var(--dark)">04 · “CONFIDENT BUT WRONG”</p>
+<p class="big in" style="--i:0;width:1600px">“Done! Your refund of $149 is processed, ticket RET-7777.”</p>
+<p class="lead in" style="--i:1;color:var(--dark);width:1500px">Fluent and confident, but no eligibility check, no ticket, and RET-7777 was invented. The status comes from tool results: <b>incomplete</b>.</p>
+<div class="row in" style="--i:2;gap:20px">
+<p class="pill" style="background:var(--dark);color:var(--light)">completion check → nudge once</p>
+<p class="pill" style="background:var(--dark);color:var(--light)">diagnose() → flags RET-7777 as hallucinated</p>
+</div>
+<aside>Run the lying_model cell with enforce_completion False, then True. The scripted model ignores the nudge, so the status honestly stays incomplete; a real model usually follows the nudge. Lesson: never derive business outcomes from the model's words.</aside>
+</section>

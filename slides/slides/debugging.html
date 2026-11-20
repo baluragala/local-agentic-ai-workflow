@@ -1,0 +1,17 @@
+<section id="debugging">
+<div class="head">
+<p class="eyebrow">06 · COMMON FAILURE POINTS</p>
+<h2>Find the first wrong event</h2>
+</div>
+<table class="tight">
+<tr><th style="width:24%">Failure point</th><th style="width:36%">Symptom</th><th>Mitigation</th></tr>
+<tr><td>Interpretation</td><td>wrong intent, invented order ID</td><td>structured output + “must appear in text” guard</td></tr>
+<tr><td>Tool selection</td><td>unknown or skipped tool</td><td>validator, clearer descriptions, preconditions</td></tr>
+<tr><td>Arguments</td><td>wrong names, types, amounts</td><td>schema check, coercion, cross-check results</td></tr>
+<tr><td>Output format</td><td>tool call written as text</td><td>recovery parser in the LLM wrapper</td></tr>
+<tr><td>Fake success</td><td>fluent answer, no ticket</td><td>completion check; status from tool results</td></tr>
+<tr><td>Looping</td><td>same call repeated</td><td>max_steps safety stop</td></tr>
+</table>
+<p class="body"><b>Reproduce</b> → read the trace by layer → find the first wrong event → script the model → fix → <b>add a test case</b>.</p>
+<aside>This is the debugging workflow learners should take away. diagnose(state) automates the first pass: it lists rejected calls, tool errors, incomplete runs and IDs or amounts in the answer that no tool produced.</aside>
+</section>

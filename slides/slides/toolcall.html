@@ -1,0 +1,26 @@
+<section id="toolcall" class="dark">
+<div class="head">
+<p class="eyebrow">02 · FIRST TOOL CALL</p>
+<h2>The response is a request, not a result</h2>
+</div>
+<div class="cols2" style="grid-template-columns:1.25fr 1fr">
+<div class="code" style="font-size:24px">
+resp = client.chat(model=MODEL, messages=msgs,<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;tools=toy_tools)<br>
+resp.message.content&#160;&#160;&#160;&#160;<span class="c"># ''</span><br>
+resp.message.tool_calls <span class="c"># get_shipping_cost(</span><br>
+<span class="c">#&#160;&#160;weight_kg=3, express=True)</span><br>
+<br>
+<span class="c"># the APPLICATION executes it</span><br>
+result = get_shipping_cost(**args)<br>
+msgs.append({<span class="s">"role"</span>: <span class="s">"tool"</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="s">"content"</span>: json.dumps(result)})<br>
+final = client.chat(model=MODEL, messages=msgs)
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div class="card"><p class="tag">1</p><p class="txt">Model reads the tool schema and asks for a call.</p></div>
+<div class="card"><p class="tag">2</p><p class="txt">Our code runs the function.</p></div>
+<div class="card"><p class="tag">3</p><p class="txt">The result goes back, and the model writes the answer.</p></div>
+</div>
+</div>
+<aside>This round trip is the core of every agent. Section 3 puts it in a loop and adds planning, validation, state and termination. Also show the structured output cell (TicketTriage) here: agents need parseable output.</aside>
+</section>

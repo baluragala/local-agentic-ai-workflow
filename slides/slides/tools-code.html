@@ -1,0 +1,33 @@
+<section id="tools-code">
+<div class="head">
+<p class="eyebrow">03 · TOOLS + SCHEMAS</p>
+<h2>The model never sees the code, only the schema</h2>
+</div>
+<div class="cols2" style="grid-template-columns:1fr 1fr">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p class="tag" style="font-family:'JetBrains Mono';font-size:24px;color:var(--blue)">WHAT RUNS · Python</p>
+<div class="code">
+<span class="k">def</span> check_return_eligibility(order_id):<br>
+&#160;&#160;&#160;&#160;order = get_order(order_id)<br>
+&#160;&#160;&#160;&#160;window = RETURN_WINDOW_DAYS[cat]<br>
+&#160;&#160;&#160;&#160;days = (TODAY - delivered).days<br>
+&#160;&#160;&#160;&#160;<span class="k">return</span> {<span class="s">"eligible"</span>: days &lt;= window,<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="s">"reason"</span>: ...}
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p class="tag" style="font-family:'JetBrains Mono';font-size:24px;color:var(--blue)">WHAT THE MODEL SEES · JSON</p>
+<div class="code">
+{<span class="s">"name"</span>: <span class="s">"calculate_refund"</span>,<br>
+&#160;<span class="s">"description"</span>: <span class="s">"Calculate the refund<br>
+&#160;&#160;amount for an ELIGIBLE return."</span>,<br>
+&#160;<span class="s">"parameters"</span>: {<br>
+&#160;&#160;<span class="s">"return_reason"</span>: {<span class="s">"enum"</span>: [<br>
+&#160;&#160;&#160;<span class="s">"damaged"</span>, <span class="s">"defective"</span>,<br>
+&#160;&#160;&#160;<span class="s">"wrong_item"</span>, <span class="s">"changed_mind"</span>]}}}
+</div>
+</div>
+</div>
+<p class="body">Descriptions are the model’s main signal for which tool to choose and when. TODAY is frozen to 2026-03-15 so results are reproducible.</p>
+<aside>Point out normalize_order_id: tools accept ORD-1002, #1002 or 1002. Making tools tolerant of harmless variation is cheaper than prompting the model into perfection.</aside>
+</section>

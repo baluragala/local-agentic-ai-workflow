@@ -1,0 +1,16 @@
+<section id="levels">
+<div class="head">
+<p class="eyebrow">05 · WHAT ARE WE EVALUATING?</p>
+<h2>Three levels that can disagree</h2>
+</div>
+<div class="cols3">
+<div class="card in" style="--i:0"><p class="tag">LEVEL 1</p><h3>Model response quality</h3><p class="txt">Is the reply fluent, polite, accurate? Human review, LLM-as-judge, heuristics.</p></div>
+<div class="card in" style="--i:1"><p class="tag">LEVEL 2</p><h3>Workflow execution</h3><p class="txt">Allowed actions, right order, valid calls? Criteria 1–5.</p></div>
+<div class="card hl in" style="--i:2"><p class="tag">LEVEL 3</p><h3>Business outcome</h3><p class="txt">Was the task actually done correctly? Criterion 7: ticket + correct refund.</p></div>
+</div>
+<div class="card" style="flex-direction:row;align-items:center;gap:40px">
+<p class="num">✗</p>
+<p class="txt" style="font-size:30px">The lying model scores <b>yes</b> on fluency and <b>fails</b> step completion, final output and business outcome. Fluency is not success.</p>
+</div>
+<aside>The purpose of evaluation is to check whether the workflow satisfies the defined requirements across test cases, not whether the model sounds good. Run cell 5.5 to show the per-criterion breakdown for the fluent-but-wrong run.</aside>
+</section>

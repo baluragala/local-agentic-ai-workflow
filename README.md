@@ -45,3 +45,9 @@ A 3-hour, live-coding demo notebook. It builds a transparent agentic workflow wi
 python scripts/build_notebook.py
 python scripts/test_notebook_offline.py   # needs: ollama pydantic pandas nbformat nbclient ipykernel
 ```
+
+## Slides
+
+`slides/` holds the source of the session deck (26 slides, speaker notes in each slide's `<aside>`):
+`deck.json` (slide order and sections), `deck.css` (theme) and one HTML file per slide in `slides/slides/`.
+The published deck: https://claude.ai/artifact/PkMst8sWiiw6Vyp9693zFi (export to PPTX/PDF from its Share menu).

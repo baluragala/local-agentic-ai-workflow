@@ -1,0 +1,30 @@
+<section id="state">
+<div class="head">
+<p class="eyebrow">03 · WORKFLOW STATE</p>
+<h2>One object remembers the whole run</h2>
+</div>
+<div class="cols2" style="grid-template-columns:1fr 1.1fr">
+<div class="code" style="font-size:24px">
+@dataclass<br>
+<span class="k">class</span> AgentState:<br>
+&#160;&#160;&#160;&#160;request: str<br>
+&#160;&#160;&#160;&#160;plan: dict | None<br>
+&#160;&#160;&#160;&#160;messages: list&#160;&#160;&#160;<span class="c"># conversation</span><br>
+&#160;&#160;&#160;&#160;tool_calls: list <span class="c"># name, args, result</span><br>
+&#160;&#160;&#160;&#160;trace: list&#160;&#160;&#160;&#160;&#160;&#160;<span class="c"># every event + layer</span><br>
+&#160;&#160;&#160;&#160;status: str<br>
+&#160;&#160;&#160;&#160;final_answer: str | None<br>
+&#160;&#160;&#160;&#160;step: int
+</div>
+<table class="tight">
+<tr><th style="width:34%">Layer</th><th>Logged when …</th></tr>
+<tr><td>🧠 LLM</td><td>model generated a plan, tool request or answer</td></tr>
+<tr><td>📋 PLAN</td><td>plan accepted, hallucinated ID caught</td></tr>
+<tr><td>🛡️ VALIDATE</td><td>app accepted or rejected a request</td></tr>
+<tr><td>🔧 TOOL</td><td>app executed a tool</td></tr>
+<tr><td>📦 STATE</td><td>start, nudge, termination</td></tr>
+</table>
+</div>
+<p class="body">Tagging every event with its layer means we can always answer: who did what, and where did it go wrong?</p>
+<aside>The trace is the debugging superpower for the rest of the session. Show trace_table(state) as a DataFrame after the first full run.</aside>
+</section>

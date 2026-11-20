@@ -1,0 +1,22 @@
+<section id="task">
+<div class="head">
+<p class="eyebrow">01 · BUSINESS PROBLEM</p>
+<h2>ShopEase Returns Desk</h2>
+</div>
+<div class="cols2" style="grid-template-columns:1.1fr 1fr">
+<div style="display:flex;flex-direction:column;gap:28px">
+<div class="card hl"><p class="tag">INPUT · ONE CUSTOMER MESSAGE</p><p class="txt" style="font-size:32px;color:#E8E2D2">“Hi, my headphones from order ORD-1002 arrived with a cracked headband. I’d like to return them.”</p></div>
+<p class="body"><b>Policy:</b> electronics 15 days, apparel and home 30 days, gift cards non-returnable. A 10% restocking fee applies when the customer simply changed their mind.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<h3>Expected outcome: exactly one of</h3>
+<p class="pill" style="align-self:flex-start">ticket_created + correct refund</p>
+<p class="pill" style="align-self:flex-start">declined + the policy reason</p>
+<p class="pill" style="align-self:flex-start">answered (order status)</p>
+<p class="pill" style="align-self:flex-start">order_not_found</p>
+<p class="pill" style="align-self:flex-start">needs_info → ask the customer</p>
+<p class="pill" style="align-self:flex-start">out_of_scope</p>
+</div>
+</div>
+<aside>Define the task before any code: input, goal, expected outcomes, rules. The outcome list on the right becomes the status field of our state, and later the thing we evaluate. Emphasise that outcomes are business outcomes, not text quality.</aside>
+</section>
