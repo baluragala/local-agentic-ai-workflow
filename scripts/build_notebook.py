@@ -29,7 +29,7 @@ md(r"""
 # Building a Local Agentic AI Workflow
 ### LW1 · S2 — Hands-on demo (Google Colab compatible)
 
-<a href="https://colab.research.google.com/" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+<a href="https://colab.research.google.com/github/baluragala/local-agentic-ai-workflow/blob/main/notebooks/LW1_S2_Local_Agentic_AI_Workflow.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 In this session we build a **small, fully transparent agentic workflow** that runs on a **local open-weight model served by Ollama**. No cloud LLM API, no API keys, no agent framework. Everything is plain Python, so you can see every moving part.
 

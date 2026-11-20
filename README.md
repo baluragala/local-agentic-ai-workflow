@@ -1,5 +1,7 @@
 # LW1 · S2 — Building a Local Agentic AI Workflow
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/baluragala/local-agentic-ai-workflow/blob/main/notebooks/LW1_S2_Local_Agentic_AI_Workflow.ipynb)
+
 A 3-hour, live-coding demo notebook. It builds a transparent agentic workflow with a small open-weight model served locally by **Ollama**: plain Python, no framework, no API keys.
 
 **Scenario:** *ShopEase Returns Desk.* A customer message comes in, and the agent plans, calls tools (`get_order`, `check_return_eligibility`, `calculate_refund`, `create_return_ticket`) and replies. The result is a ticket, a policy decline, an order-status answer, or a request for missing information.
