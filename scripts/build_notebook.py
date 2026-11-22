@@ -834,7 +834,7 @@ md(r"""
 ## 3.10 The full agent loop
 Now we automate exactly what we just did by hand, and add:
 * **termination conditions** (final answer, `max_steps`, missing info, out of scope)
-* a **completion check**: if the model tries to finish while a required step is still open (e.g. eligible but no ticket), the orchestrator nudges it **once**
+* a **completion check**: if the model tries to finish while a required step is still open (e.g. eligible but no ticket), the orchestrator **nudges** it with the exact next call. Small models often stop early, sometimes more than once per run, so a nudge is allowed each time the model has made progress since the last one (max `MAX_NUDGES`). A model that ignores a nudge is not nudged again.
 * a **status derived from tool results**, *not* from the model's wording
 """)
 code(r"""
@@ -846,16 +846,25 @@ OUT_OF_SCOPE_REPLY = ("I'm the ShopEase returns desk, so I can help with returns
 
 def completion_gap(state: AgentState) -> str | None:
     # What required step is still open? (None = OK to finish)
+    # The hint names the exact next call: small models follow a concrete instruction far better than a vague one.
     plan = state.plan or {}
-    if not state.tool_calls:
-        return "You have not called any tool yet. Start with get_order."
-    if plan.get("intent") == "return_request":
-        elig = state.last_result("check_return_eligibility")
-        order = state.last_result("get_order") or {}
-        if elig is None and "error" not in order:
-            return "You have not checked return eligibility yet. Call check_return_eligibility."
-        if elig and elig.get("eligible") and "create_return_ticket" not in state.tools_used():
-            return "The return is eligible but no ticket exists. Call calculate_refund (if needed) then create_return_ticket."
+    oid, reason = plan.get("order_id"), plan.get("return_reason")
+    order = state.last_result("get_order")
+    if order is None:
+        return f'Not done yet. Call get_order with order_id="{oid}".'
+    if "error" in order or plan.get("intent") != "return_request":
+        return None
+    elig = state.last_result("check_return_eligibility")
+    if elig is None:
+        return f'Not done yet. The order exists. Call check_return_eligibility with order_id="{oid}".'
+    if not elig.get("eligible"):
+        return None
+    refund = state.last_result("calculate_refund")
+    if refund is None or "error" in refund:
+        return f'Not done yet. The return is eligible. Call calculate_refund with order_id="{oid}", return_reason="{reason}".'
+    if state.last_result("create_return_ticket") is None:
+        return (f'Not done yet. Call create_return_ticket with order_id="{oid}", return_reason="{reason}", '
+                f'refund_amount={refund["refund_amount"]}.')
     return None
 
 
@@ -874,7 +883,10 @@ def derive_status(state: AgentState) -> str:
     return "incomplete"
 
 
-def run_agent(request: str, max_steps: int = 8, enforce_completion: bool = True, verbose: bool = True) -> AgentState:
+MAX_NUDGES = 3
+
+
+def run_agent(request: str, max_steps: int = 10, enforce_completion: bool = True, verbose: bool = True) -> AgentState:
     state = AgentState(request, verbose=verbose)
     state.log("STATE", "task received", request)
 
@@ -900,7 +912,7 @@ def run_agent(request: str, max_steps: int = 8, enforce_completion: bool = True,
 
     # ---- 2. act: next-action loop ---------------------------------------------
     state.messages = initial_messages(state, plan)
-    nudged = False
+    nudges, calls_at_last_nudge = 0, -1
     while state.step < max_steps:
         state.step += 1
         msg, calls = call_llm(state.messages, tools=TOOL_SCHEMAS)
@@ -908,9 +920,13 @@ def run_agent(request: str, max_steps: int = 8, enforce_completion: bool = True,
 
         if not calls:                             # model wants to finish
             gap = completion_gap(state) if enforce_completion else None
-            if gap and not nudged:
-                nudged = True
-                state.log("STATE", "completion check", f"NOT done: {gap}")
+            # Nudge again only if the model made progress (a valid tool call) since the last nudge,
+            # so a model that ignores the nudge cannot loop forever.
+            progressed = len(state.tools_used()) > calls_at_last_nudge
+            if gap and progressed and nudges < MAX_NUDGES:
+                nudges, calls_at_last_nudge = nudges + 1, len(state.tools_used())
+                state.log("LLM", "stopped early", msg["content"] or "(empty)")
+                state.log("STATE", "completion check", f"nudge {nudges}/{MAX_NUDGES}: {gap}")
                 state.messages.append({"role": "user", "content": f"[Orchestrator] {gap}"})
                 continue
             state.final_answer = msg["content"]
@@ -1123,7 +1139,7 @@ show_summary(s_on)
 """)
 
 md(r"""
-The answer *sounds* perfect, but `status=incomplete`, no ticket exists and `RET-7777` is invented. With the check on, the orchestrator spots the open step and nudges once. This scripted model ignores the nudge, so the status stays `incomplete`, which is **honest**. A real model usually follows the nudge.
+The answer *sounds* perfect, but `status=incomplete`, no ticket exists and `RET-7777` is invented. With the check on, the orchestrator spots the open step and nudges. This scripted model ignores the nudge (no progress), so it is not nudged again and the status stays `incomplete`, which is **honest**. A real model usually follows the nudge.
 
 ### A debugging helper
 Read the state and point at the **layer** that went wrong:

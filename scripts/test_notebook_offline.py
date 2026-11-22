@@ -45,7 +45,7 @@ class FakeClient:
                 return self._resp("", [("get_shipping_cost", {"weight_kg": 3, "express": True})])
             return self._resp(f"Express shipping for 3 kg costs ${json.loads(tool_msgs[-1]['content'])['cost_usd']}.")
         if "get_order" in names:
-            return self._act(user, tool_msgs)
+            return self._act(user, tool_msgs, msgs)
         return self._resp("Hello! Thanks for shopping with ShopEase.")
 
     def _plan(self, text):
@@ -64,7 +64,13 @@ class FakeClient:
         return {"intent": intent, "order_id": m.group(1) if m else None, "return_reason": reason,
                 "steps": ["get_order", "check_return_eligibility", "calculate_refund", "create_return_ticket"]}
 
-    def _act(self, user, tool_msgs):
+    lazy = False   # True = stall like qwen2.5:1.5b did: answer without a tool at the start and after get_order
+
+    def _act(self, user, tool_msgs, msgs=None):
+        last = (msgs or [{}])[-1]
+        nudged = last.get("role") == "user" and str(last.get("content", "")).startswith("[Orchestrator]")
+        if self.lazy and not nudged and len(tool_msgs) in (0, 1):
+            return self._resp("I found your order. Please provide your order ID and we will proceed.")
         ctx = dict(re.findall(r"(\w+)=([^;\s]+)", user.split("[Planner context]")[-1]))
         res = {}
         for m in tool_msgs:
@@ -104,6 +110,16 @@ for c in nb.cells:
             injected = True
         continue
     cells.append(c)
+# Regression: a model that stops early twice must still be nudged through to a ticket.
+cells.append(nbf.v4.new_code_cell(r"""
+client.lazy = True
+TICKETS.clear()
+_s = run_agent("Hello, order ORD-1002: the headphones arrived damaged, the headband is cracked. Please refund me.")
+client.lazy = False
+assert _s.status == "ticket_created", (_s.status, _s.tools_used())
+assert sum(e["event"] == "completion check" for e in _s.trace) == 2
+print("REGRESSION lazy-model:", _s.status, _s.tools_used())
+"""))
 nb.cells = cells
 
 client = NotebookClient(nb, timeout=120, kernel_name="python3", allow_errors=False,
