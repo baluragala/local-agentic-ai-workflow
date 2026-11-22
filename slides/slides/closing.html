@@ -1,0 +1,21 @@
+<section id="closing">
+<div class="head">
+<p class="eyebrow">06 · CLOSING · ONE REQUEST, START TO FINISH</p>
+<h2>The model proposes. The application decides.</h2>
+</div>
+<div class="cols4">
+<div class="card in" style="--i:0;padding:28px"><p class="tag">1 · APP</p><h3>Receive task</h3><p class="txt">Start state, log the event</p></div>
+<div class="card hl in" style="--i:1;padding:28px"><p class="tag">2 · LLM</p><h3>Understand + plan</h3><p class="txt">Intent, order ID, reason</p></div>
+<div class="card in" style="--i:2;padding:28px"><p class="tag">3 · APP</p><h3>Check the plan</h3><p class="txt">Missing info? Out of scope?</p></div>
+<div class="card hl in" style="--i:3;padding:28px"><p class="tag">4 · LLM ↺</p><h3>Decide next action</h3><p class="txt">Pick one tool + arguments</p></div>
+<div class="card in" style="--i:4;padding:28px"><p class="tag">5 · APP ↺</p><h3>Validate</h3><p class="txt">Tool, args, business rules</p></div>
+<div class="card in" style="--i:5;padding:28px"><p class="tag">6 · APP ↺</p><h3>Execute tool</h3><p class="txt">Run code, store in state</p></div>
+<div class="card in" style="--i:6;padding:28px"><p class="tag">7 · APP</p><h3>Check completion</h3><p class="txt">Step missing? Nudge it</p></div>
+<div class="card in" style="--i:7;padding:28px"><p class="tag">8 · APP</p><h3>Finish with a status</h3><p class="txt">From tool results, not words</p></div>
+</div>
+<p class="lead in" style="--i:8">↺ Steps 4–6 loop until done. A 1.5B model on a free GPU created correct refund tickets: the <b>workflow around the model</b> is what made it reliable.</p>
+<aside>Walk one request through all eight steps: "Order ORD-1002, headphones arrived damaged, please refund me." Dark cards are the only places the model acts; everything else is our code.
+Five takeaways: (1) an agent is a loop, not a prompt; (2) tools are ordinary code, so test them first; (3) business rules belong in validators, not prompts; (4) fluent is not correct: trust tool results, not the model's words; (5) evaluate response quality, workflow execution and business outcome across many test cases.
+Two real stories from building this course: the order ID disappeared because the schema made it optional, so the small model skipped it (fix: required fields, regex extraction for fixed-format IDs); and the agent gave up after get_order because only one nudge was allowed (fix: specific nudges, capped, only while the model makes progress).
+Debugging habit: reproduce, read the trace by layer, find the first wrong event, fix, add a test case.</aside>
+</section>

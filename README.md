@@ -50,7 +50,7 @@ python scripts/test_notebook_offline.py   # needs: ollama pydantic pandas nbform
 
 ## Slides
 
-`slides/` holds the source of the session deck (26 slides, speaker notes in each slide's `<aside>`):
+`slides/` holds the source of the session deck (27 slides, speaker notes in each slide's `<aside>`):
 `deck.json` (slide order and sections), `deck.css` (theme) and one HTML file per slide in `slides/slides/`.
 **Present it from GitHub Pages:** https://baluragala.github.io/local-agentic-ai-workflow/slides/
 (`slides/index.html` is a small player: ←/→ or click to move, `F` full screen, `N` speaker notes, `#12` in the URL jumps to slide 12).
