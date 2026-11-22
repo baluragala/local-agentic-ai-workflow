@@ -34,7 +34,10 @@ class FakeClient:
         if isinstance(format, dict) and format.get("title") == "TicketTriage":
             return self._resp(json.dumps({"sentiment": "negative", "urgency": "high", "summary": "Repeated broken deliveries."}))
         if isinstance(format, dict) and format.get("title") == "Plan":
-            return self._resp(json.dumps(self._plan(user)))
+            # Like Ollama's schema grammar + a small model: optional fields are often skipped.
+            plan = self._plan(user)
+            req = set(format.get("required", plan))
+            return self._resp(json.dumps({k: v for k, v in plan.items() if k in req}))
         names = [t["function"]["name"] for t in (tools or [])]
         tool_msgs = [m for m in msgs if m["role"] == "tool"]
         if "get_shipping_cost" in names:
@@ -110,4 +113,10 @@ try:
 finally:
     OUT.parent.mkdir(exist_ok=True)
     nbf.write(nb, OUT)
+# Regression gate: the business outcome must hold for every test case.
+import re as _re
+outs = "".join(o.get("text", "") for c in nb.cells if c.cell_type == "code" for o in c.get("outputs", []))
+scores = _re.findall(r"Business task success: (\d+)/(\d+)", outs)
+assert scores and all(a == b for a, b in scores), f"business task success below 100%: {scores}"
+print("business task success:", scores)
 print(f"OK - executed {sum(c.cell_type == 'code' for c in nb.cells)} code cells; output saved to {OUT}")

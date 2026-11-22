@@ -291,7 +291,7 @@ An agent needs **parseable** model outputs, not just prose. Ollama can constrain
 """)
 code(r"""
 from typing import Literal, Optional
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 class TicketTriage(BaseModel):
     sentiment: Literal["positive", "neutral", "negative"]
@@ -714,12 +714,18 @@ md(r"""
 The first model call is a **planner**. It turns free text into a structured plan: intent, extracted order ID and reason, and the steps it proposes. Structured output (`format=`) guarantees we can parse it.
 
 The plan is the **model's proposal**. The **application** then applies the defined **missing-information behaviour**, plus a guard against a classic hallucination: an order ID that the customer never wrote.
+
+> **Schema gotcha.** With `format=`, Ollama turns the JSON schema into a grammar. A field with a default (`order_id: Optional[str] = None`) is *optional* in the schema, so the grammar lets the model **skip it**, and small models often do. The plan then has no order ID even though the customer wrote one. So every field below is **required but nullable** (no default): the model must write `"order_id": "ORD-1002"` or `"order_id": null`.
+>
+> Order IDs also have a fixed format, so the application can read them with a regex. That is cheaper and more reliable than any model. The model's value is cross-checked against it: if the model left it out, the regex fills it in; if the model invented one, it is dropped.
 """)
 code(r"""
 class Plan(BaseModel):
+    # No defaults: every field is REQUIRED in the JSON schema, so the model cannot skip it (null is allowed).
     intent: Literal["return_request", "order_status", "other"]
-    order_id: Optional[str] = None
-    return_reason: Optional[Literal["damaged", "defective", "wrong_item", "changed_mind"]] = None
+    order_id: Optional[str] = Field(description="Order ID as written by the customer, e.g. ORD-1002, or null")
+    return_reason: Optional[Literal["damaged", "defective", "wrong_item", "changed_mind"]] = Field(
+        description="Why they return the item, or null if not stated")
     steps: list[str]
 
 PLANNER_PROMPT = '''You are the planning module of the ShopEase returns desk. Read the customer message and reply with JSON only.
@@ -730,6 +736,13 @@ PLANNER_PROMPT = '''You are the planning module of the ShopEase returns desk. Re
 - steps: the ordered list of tools you would use. Tools: get_order, check_return_eligibility, calculate_refund, create_return_ticket.'''
 
 REQUIRED_INFO = {"return_request": ["order_id", "return_reason"], "order_status": ["order_id"], "other": []}
+
+# Deterministic extraction: ORD-1002, ord 1002, ORD1002, #1002, "order 1002", "order no. 1002"
+ORDER_ID_RE = re.compile(r"(?i)(?:\bord[-\s]?|#|\border\s+(?:no\.?\s*|number\s*|id\s*)?#?)(\d{4})\b")
+
+def extract_order_id(text: str) -> str | None:
+    m = ORDER_ID_RE.search(text)
+    return f"ORD-{m.group(1)}" if m else None
 
 
 def make_plan(state: AgentState) -> Plan | None:
@@ -742,12 +755,18 @@ def make_plan(state: AgentState) -> Plan | None:
     except ValidationError as e:
         state.log("PLAN", "plan INVALID", str(e).splitlines()[0])
         return None
-    # Guardrail: the order number must actually appear in the customer's text.
+    # Guardrail: the application, not the model, has the final say on the order ID.
+    found = extract_order_id(state.request)
     if plan.order_id:
         digits = re.findall(r"\d{3,}", plan.order_id)
         if not digits or digits[0] not in state.request:
-            state.log("PLAN", "hallucinated order_id", f"{plan.order_id!r} not in request -> treated as missing")
-            plan.order_id = None
+            state.log("PLAN", "hallucinated order_id", f"{plan.order_id!r} not in request -> using {found!r}")
+            plan.order_id = found
+        else:
+            plan.order_id = normalize_order_id(plan.order_id)
+    elif found:
+        state.log("PLAN", "order_id recovered", f"model returned none; found {found!r} in the request")
+        plan.order_id = found
     state.plan = plan.model_dump()
     return plan
 
@@ -760,6 +779,7 @@ s = AgentState("My headphones from ORD-1002 arrived cracked, I want to return th
 p = make_plan(s)
 print("\nplan   :", p)
 print("missing:", missing_info(p))
+print("schema required:", Plan.model_json_schema()["required"])
 s2 = AgentState("I want to return my shoes, they don't fit.")
 p2 = make_plan(s2)
 print("\nplan   :", p2)
