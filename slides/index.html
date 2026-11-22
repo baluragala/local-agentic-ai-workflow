@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local Agentic AI Workflow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+<style>
+  /* ---- player chrome (not part of the slides) ---- */
+  html, body { margin: 0; height: 100%; background: #0B1312; overflow: hidden; }
+  #viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage { width: 1920px; height: 1080px; flex: none; transform-origin: center center; position: relative; box-shadow: 0 10px 60px rgba(0,0,0,.5); }
+  #stage > section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  #stage > section.fade { animation: fadein 400ms ease-out both; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+  /* base reset the slide runtime normally provides */
+  #stage * { margin: 0; box-sizing: border-box; }
+  #stage aside { display: none; }
+  #stage table { border-collapse: collapse; }
+  #stage th, #stage td { text-align: left; vertical-align: top; padding: 14px 18px; border-bottom: 2px solid var(--line); }
+  #stage th { font-family: 'Space Grotesk', Arial, sans-serif; font-weight: 600; }
+  #stage section.dark th, #stage section.dark td { border-bottom-color: #2E403D; }
+  #stage ul, #stage ol { padding-left: 1.3em; }
+  #stage li + li { margin-top: .4em; }
+  #stage x-shape { display: block; flex: none; }
+  #stage x-shape[kind="arrow-right"] { clip-path: polygon(0 35%, 60% 35%, 60% 0, 100% 50%, 60% 100%, 60% 65%, 0 65%); }
+  #stage x-shape[kind="arrow-down"]  { clip-path: polygon(35% 0, 65% 0, 65% 60%, 100% 60%, 50% 100%, 0 60%, 35% 60%); }
+
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+         font: 14px/1.2 Inter, Arial, sans-serif; color: #B9C9C6; background: linear-gradient(transparent, rgba(0,0,0,.75));
+         opacity: 0; transition: opacity .25s; }
+  body:hover #bar, #bar:focus-within, body.notes #bar { opacity: 1; }
+  #bar button { font: inherit; color: #F5F3EC; background: rgba(255,255,255,.1); border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  #bar button:hover { background: rgba(255,255,255,.2); }
+  #bar .grow { flex: 1; }
+  #progress { position: fixed; left: 0; top: 0; height: 4px; background: #E58A3C; transition: width .3s; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 48px; max-height: 32vh; overflow: auto; display: none;
+           margin: 0 auto; width: min(1100px, calc(100% - 32px)); padding: 18px 22px; border-radius: 10px;
+           font: 18px/1.5 Inter, Arial, sans-serif; color: #F5F3EC; background: rgba(19,32,31,.95); border: 1px solid #2E403D; }
+  body.notes #notes { display: block; }
+  #error { color: #F5F3EC; font: 18px/1.5 Inter, Arial, sans-serif; max-width: 640px; padding: 16px; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="stage"></div></div>
+<div id="notes"></div>
+<div id="bar">
+  <button id="prev" title="Previous (←)">←</button>
+  <button id="next" title="Next (→ / space)">→</button>
+  <span id="count"></span>
+  <span class="grow" id="sectionname"></span>
+  <button id="notesbtn" title="Speaker notes (N)">Notes</button>
+  <button id="fsbtn" title="Full screen (F)">Full screen</button>
+</div>
+<script>
+(async function () {
+  const stage = document.getElementById('stage');
+  const viewport = document.getElementById('viewport');
+  let deck, slides = [], idx = 0;
+
+  try {
+    deck = await (await fetch('deck.json')).json();
+    document.title = deck.title || document.title;
+    slides = await Promise.all(deck.order.map(async id => {
+      const r = await fetch('slides/' + id + '.html');
+      if (!r.ok) throw new Error('slides/' + id + '.html: ' + r.status);
+      return { id, html: await r.text() };
+    }));
+  } catch (e) {
+    viewport.innerHTML = '<p id="error">Could not load the deck (' + e.message + '). ' +
+      'If you opened this file directly from disk, serve the folder instead: <code>python3 -m http.server</code> ' +
+      'in <code>slides/</code>, then open http://localhost:8000.</p>';
+    return;
+  }
+
+  const sectionOf = id => {
+    let name = '';
+    for (const id2 of deck.order) {
+      for (const s of Object.values(deck.sections || {})) if (s.start === id2) name = s.description;
+      if (id2 === id) return name;
+    }
+    return name;
+  };
+
+  function fit() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+
+  function show(i) {
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    stage.innerHTML = slides[idx].html;           // re-inserting replays the entry animations
+    const sec = stage.querySelector('section');
+    if (sec && sec.dataset.transition === 'fade') sec.classList.add('fade');
+    const aside = sec && sec.querySelector('aside');
+    document.getElementById('notes').textContent = aside ? aside.textContent.trim() : '(no notes)';
+    document.getElementById('count').textContent = (idx + 1) + ' / ' + slides.length;
+    document.getElementById('sectionname').textContent = sectionOf(slides[idx].id);
+    document.getElementById('progress').style.width = ((idx + 1) / slides.length * 100) + '%';
+    history.replaceState(null, '', '#' + (idx + 1));
+  }
+
+  const toggleFs = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  const toggleNotes = () => document.body.classList.toggle('notes');
+
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); show(idx + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); show(idx - 1); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 1);
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'n' || k === 'N') toggleNotes();
+  });
+  viewport.addEventListener('click', e => show(idx + (e.clientX < window.innerWidth / 3 ? -1 : 1)));
+  let tx = null;
+  viewport.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  viewport.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+  });
+  document.getElementById('prev').onclick = () => show(idx - 1);
+  document.getElementById('next').onclick = () => show(idx + 1);
+  document.getElementById('notesbtn').onclick = toggleNotes;
+  document.getElementById('fsbtn').onclick = toggleFs;
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n && n - 1 !== idx) show(n - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+})();
+</script>
+</body>
+</html>

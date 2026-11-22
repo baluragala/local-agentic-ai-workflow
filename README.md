@@ -52,4 +52,8 @@ python scripts/test_notebook_offline.py   # needs: ollama pydantic pandas nbform
 
 `slides/` holds the source of the session deck (26 slides, speaker notes in each slide's `<aside>`):
 `deck.json` (slide order and sections), `deck.css` (theme) and one HTML file per slide in `slides/slides/`.
-The published deck: https://claude.ai/artifact/PkMst8sWiiw6Vyp9693zFi (export to PPTX/PDF from its Share menu).
+**Present it from GitHub Pages:** https://baluragala.github.io/local-agentic-ai-workflow/slides/
+(`slides/index.html` is a small player: ←/→ or click to move, `F` full screen, `N` speaker notes, `#12` in the URL jumps to slide 12).
+To run it locally: `cd slides && python3 -m http.server`, then open http://localhost:8000.
+
+The same deck as a Claude artifact (can export to PPTX/PDF from its Share menu): https://claude.ai/artifact/PkMst8sWiiw6Vyp9693zFi
